@@ -1,6 +1,6 @@
 const express = require('express');
 const controllers = require('./controllers/app.controllers');
-const errorHandlers = require('error-handlers.js');
+const errorHandlers = require('./error-handlers.js');
 
 const app = express();
 
