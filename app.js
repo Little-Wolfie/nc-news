@@ -1,23 +1,13 @@
 const express = require('express');
 const controllers = require('./controllers/app.controllers');
+const errorHandlers = require('error-handlers.js');
 
 const app = express();
-
-// some console feedback for when using the app from a terminal
-app.use((req, res, next) => {
-	const { method, url } = req;
-	console.log(`
-  METHOD: ${method}
-  URL: ${url}
-  TIMESTAMP: ${new Date().toUTCString()}
-  `);
-	next();
-});
 
 app.get('/api/topics', controllers.getTopics);
 
 app.use((err, req, res, next) => {
-	console.log(err);
+	errorHandlers.handleUncaughtError(err);
 });
 
 app.all('/*', (req, res) => {
