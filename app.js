@@ -7,21 +7,12 @@ const app = express();
 app.get('/api/topics', controllers.getTopics);
 app.get('/api/articles/:article_id', controllers.getArticleById);
 
-app.use((err, req, res, next) => {
-	console.log('ERROR CODE: ', err.code);
+app.all('/*', errorHandlers.handleWrongPath);
 
-	if (err.code === '22P02' || err.code === 400) {
-		errorHandlers.handleBadRequest(res);
-	} else if (err.code === 404) {
-		errorHandlers.handleNotFound(res);
-	} else {
-		errorHandlers.handleUncaughtError(res);
-	}
-});
+app.use(errorHandlers.handleBadRequest);
+app.use(errorHandlers.handleNotFound);
+app.use(errorHandlers.handleUncaughtError);
 
-app.all('/*', (req, res) => {
-	console.log('ERROR CODE: ', 404);
-	errorHandlers.handleNotFound(res);
-});
+
 
 module.exports = app;
