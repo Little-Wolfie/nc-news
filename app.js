@@ -5,13 +5,14 @@ const errorHandlers = require('./error-handlers.js');
 const app = express();
 
 app.get('/api/topics', controllers.getTopics);
+app.get('/api/articles/:article_id', controllers.getArticleById);
 
-app.use((err, req, res, next) => {
-	errorHandlers.handleUncaughtError(err);
-});
+app.all('/*', errorHandlers.handleWrongPath);
 
-app.all('/*', (req, res) => {
-	res.status(404).send({ msg: 'Resource not found' });
-});
+app.use(errorHandlers.handleBadRequest);
+app.use(errorHandlers.handleNotFound);
+app.use(errorHandlers.handleUncaughtError);
+
+
 
 module.exports = app;
