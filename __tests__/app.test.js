@@ -58,32 +58,18 @@ describe('/api/topics', () => {
 
 describe('/api/articles/:article_id', () => {
 	describe('200: GET:', () => {
-		it('responds with a 200 status code', () => {
-			return request(app).get('/api/articles/1').expect(200);
-		});
-
-		it('responds with a single object with a key of article', () => {
-			return request(app)
-				.get('/api/articles/1')
-				.expect(200)
-				.then(({ body }) => {
-					expect(body).toBeInstanceOf(Object);
-					expect(body).toHaveProperty('article');
-				});
-		});
-
-		it('responds with an object with the correct shape', () => {
+		it('responds with status 200 and a single object with a key of article and with the correct shape', () => {
 			return request(app)
 				.get('/api/articles/1')
 				.expect(200)
 				.then(({ body: { article } }) => {
 					expect(article).toMatchObject({
-						article_id: expect.any(Number),
+						article_id: 1,
 						title: expect.any(String),
 						topic: expect.any(String),
 						author: expect.any(String),
 						body: expect.any(String),
-						created_at: expect.any(String), // was expecting Date but got a String ?
+						created_at: expect.any(String),
 						votes: expect.any(Number),
 						article_img_url: expect.any(String),
 					});
