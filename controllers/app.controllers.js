@@ -1,6 +1,6 @@
 const models = require('../models/app.models');
 
-const getTopics = async (req, res, next) => {
+exports.getTopics = async (req, res, next) => {
 	try {
 		const topics = await models.fetchTopics();
 		res.status(200).send({ topics });
@@ -9,7 +9,7 @@ const getTopics = async (req, res, next) => {
 	}
 };
 
-const getArticleById = async (req, res, next) => {
+exports.getArticleById = async (req, res, next) => {
 	const { article_id } = req.params;
 
 	try {
@@ -20,7 +20,11 @@ const getArticleById = async (req, res, next) => {
 	}
 };
 
-module.exports = {
-	getTopics,
-	getArticleById,
+exports.getArticles = async (req, res, next) => {
+	try {
+		const articles = await models.fetchArticles();
+		res.status(200).send({ articles });
+	} catch (err) {
+		next(err);
+	}
 };

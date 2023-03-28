@@ -22,3 +22,13 @@ exports.fetchArticleById = async id => {
 		return results.rows[0];
 	}
 };
+
+exports.fetchArticles = async () => {
+	const results = await db.query('SELECT * FROM articles');
+
+	if (results.rowCount === 0) {
+		return Promise.reject({ code: 404 });
+	} else {
+		return results.rows;
+	}
+};

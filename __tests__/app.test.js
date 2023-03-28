@@ -107,3 +107,40 @@ describe('/api/articles/:article_id', () => {
 		});
 	});
 });
+
+describe('/api/articles', () => {
+	describe('200: GET:', () => {
+		it('responds with status 200 and an array of object with the correct shape', () => {
+			return request(app)
+				.get('/api/articles')
+				.expect(200)
+				.then(({ body: { articles } }) => {
+					expect(articles).toBeInstanceOf(Array);
+					expect(articles).toHaveLength(12);
+					articles.forEach(article => {
+						expect(article).toMatchObject({
+							article_id: expect.any(Number),
+							title: expect.any(String),
+							topic: expect.any(String),
+							author: expect.any(String),
+							body: expect.any(String),
+							created_at: expect.any(String),
+							votes: expect.any(Number),
+							article_img_url: expect.any(String),
+						});
+					});
+				});
+		});
+	});
+
+	describe('404: GET:', () => {
+		it('responds with status 404 and a message about the error', () => {
+			return request(app)
+				.get('/api/article')
+				.expect(404)
+				.then(({ body: { msg } }) => {
+					expect(msg).toBe('Resource not found');
+				});
+		});
+	});
+});
