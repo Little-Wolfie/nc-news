@@ -29,6 +29,6 @@ exports.fetchArticles = async () => {
 	if (results.rowCount === 0) {
 		return Promise.reject({ code: 404 });
 	} else {
-		return results.rows;
+		return results.rows.sort((a, b) => a.created_at - b.created_at);
 	}
 };

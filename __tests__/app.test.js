@@ -129,6 +129,7 @@ describe('/api/articles', () => {
 							article_img_url: expect.any(String),
 						});
 					});
+          expect(articles).toBeSortedBy('created_at');
 				});
 		});
 	});
