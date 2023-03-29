@@ -24,11 +24,23 @@ exports.fetchArticleById = async id => {
 };
 
 exports.fetchArticles = async () => {
-	const results = await db.query('SELECT * FROM articles');
+	const articleQuery = await db.query(
+		'SELECT * FROM articles ORDER BY created_at DESC'
+	);
+	const commentQuery = await db.query('SELECT * FROM comments');
 
-	if (results.rowCount === 0) {
+	if (articleQuery.rowCount === 0) {
 		return Promise.reject({ code: 404 });
 	} else {
-		return results.rows.sort((a, b) => a.created_at - b.created_at);
+		const { rows: articles } = articleQuery;
+		const { rows: comments } = commentQuery;
+
+		articles.map(article => {
+			article['comment_count'] = comments.filter(
+				comment => comment.article_id === article.article_id
+			).length;
+		});
+
+		return articleQuery.rows;
 	}
 };

@@ -111,6 +111,8 @@ describe('/api/articles/:article_id', () => {
 describe('/api/articles', () => {
 	describe('200: GET:', () => {
 		it('responds with status 200 and an array of object with the correct shape', () => {
+			const { commentData } = data;
+
 			return request(app)
 				.get('/api/articles')
 				.expect(200)
@@ -118,6 +120,10 @@ describe('/api/articles', () => {
 					expect(articles).toBeInstanceOf(Array);
 					expect(articles).toHaveLength(12);
 					articles.forEach(article => {
+						let commentCount = commentData.filter(
+							comment => comment.article_id === article.article_id
+						).length;
+
 						expect(article).toMatchObject({
 							article_id: expect.any(Number),
 							title: expect.any(String),
@@ -127,9 +133,10 @@ describe('/api/articles', () => {
 							created_at: expect.any(String),
 							votes: expect.any(Number),
 							article_img_url: expect.any(String),
+							comment_count: commentCount,
 						});
 					});
-          expect(articles).toBeSortedBy('created_at');
+					expect(articles).toBeSortedBy('created_at', { descending: true });
 				});
 		});
 	});
