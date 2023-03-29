@@ -117,7 +117,6 @@ describe('/api/articles', () => {
 				.get('/api/articles')
 				.expect(200)
 				.then(({ body: { articles } }) => {
-					expect(articles).toBeInstanceOf(Array);
 					expect(articles).toHaveLength(12);
 					articles.forEach(article => {
 						let commentCount = commentData
@@ -160,7 +159,6 @@ describe('/api/articles/:article_id/comments', () => {
 				.get('/api/articles/1/comments')
 				.expect(200)
 				.then(({ body: { comments } }) => {
-					expect(comments).toBeInstanceOf(Array);
 					expect(comments).toHaveLength(11);
 					comments.forEach(comment => {
 						expect(comment).toMatchObject({
@@ -188,13 +186,23 @@ describe('/api/articles/:article_id/comments', () => {
 
 	describe('404: GET:', () => {
 		it('responds with status 404 when given an article_id that does not exist yet', () => {
-			return request(app).get('/api/articles/99999/comments').expect(404);
+			return request(app)
+				.get('/api/articles/99999/comments')
+				.expect(404)
+				.then(({ body: { msg } }) => {
+					expect(msg).toBe('Resource not found');
+				});
 		});
 	});
 
 	describe('400: GET:', () => {
 		it('responds with status 400 when given an article_id that can not exist', () => {
-			return request(app).get('/api/articles/someid/comments').expect(400);
+			return request(app)
+				.get('/api/articles/someid/comments')
+				.expect(400)
+				.then(({ body: { msg } }) => {
+					expect(msg).toBe('Bad request');
+				});
 		});
 	});
 });
