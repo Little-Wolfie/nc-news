@@ -152,3 +152,49 @@ describe('/api/articles', () => {
 		});
 	});
 });
+
+describe('/api/articles/:article_id/comments', () => {
+	describe('200: GET:', () => {
+		it('responds with status 200 and an array of comments with the right shape', () => {
+			return request(app)
+				.get('/api/articles/1/comments')
+				.expect(200)
+				.then(({ body: { comments } }) => {
+					expect(comments).toBeInstanceOf(Array);
+					expect(comments).toHaveLength(11);
+					comments.forEach(comment => {
+						expect(comment).toMatchObject({
+							comment_id: expect.any(Number),
+							body: expect.any(String),
+							article_id: 1,
+							author: expect.any(String),
+							votes: expect.any(Number),
+							created_at: expect.any(String),
+						});
+					});
+					expect(comments).toBeSortedBy('created_at', { descending: true });
+				});
+		});
+
+		it('responds with status 200 and an empty array when there is no comments', () => {
+			return request(app)
+				.get('/api/articles/2/comments')
+				.expect(200)
+				.then(({ body: { comments } }) => {
+					expect(comments).toEqual([]);
+				});
+		});
+	});
+
+	describe('404: GET:', () => {
+		it('responds with status 404 when given an article_id that does not exist yet', () => {
+			return request(app).get('/api/articles/99999/comments').expect(404);
+		});
+	});
+
+	describe('400: GET:', () => {
+		it('responds with status 400 when given an article_id that can not exist', () => {
+			return request(app).get('/api/articles/someid/comments').expect(400);
+		});
+	});
+});

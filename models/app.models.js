@@ -42,3 +42,30 @@ exports.fetchArticles = async () => {
 		return articleQuery.rows;
 	}
 };
+
+exports.fetchCommentsByArticleId = async id => {
+	const articleQuery = db.query(
+		`
+    SELECT * FROM articles
+    WHERE article_id = $1
+    `,
+		[id]
+	);
+
+	const commentsQuery = db.query(
+		`
+    SELECT * FROM comments
+    WHERE article_id = $1
+    ORDER BY created_at DESC
+  `,
+		[id]
+	);
+
+	const results = await Promise.all([articleQuery, commentsQuery]);
+
+	if (results[0].rowCount === 0) {
+		return Promise.reject({ code: 404 });
+	} else {
+		return results[1].rows;
+	}
+};

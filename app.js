@@ -7,6 +7,10 @@ const app = express();
 app.get('/api/topics', controllers.getTopics);
 app.get('/api/articles', controllers.getArticles);
 app.get('/api/articles/:article_id', controllers.getArticleById);
+app.get(
+	'/api/articles/:article_id/comments',
+	controllers.getCommentsByArticleId
+);
 
 app.all('/*', errorHandlers.handleWrongPath);
 

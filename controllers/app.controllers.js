@@ -28,3 +28,14 @@ exports.getArticles = async (req, res, next) => {
 		next(err);
 	}
 };
+
+exports.getCommentsByArticleId = async (req, res, next) => {
+	const { article_id } = req.params;
+
+	try {
+		const comments = await models.fetchCommentsByArticleId(article_id);
+		res.status(200).send({ comments });
+	} catch (err) {
+		next(err);
+	}
+};
