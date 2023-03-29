@@ -25,22 +25,20 @@ exports.fetchArticleById = async id => {
 
 exports.fetchArticles = async () => {
 	const articleQuery = await db.query(
-		'SELECT * FROM articles ORDER BY created_at DESC'
+		`SELECT articles.*, COALESCE(comments.comment_count, 0) AS comment_count
+    FROM articles
+    LEFT JOIN (
+    SELECT article_id, COUNT(article_id) AS comment_count
+    FROM comments
+    GROUP BY article_id
+    ) comments
+    ON articles.article_id = comments.article_id
+    ORDER BY articles.created_at DESC;`
 	);
-	const commentQuery = await db.query('SELECT * FROM comments');
 
 	if (articleQuery.rowCount === 0) {
 		return Promise.reject({ code: 404 });
 	} else {
-		const { rows: articles } = articleQuery;
-		const { rows: comments } = commentQuery;
-
-		articles.map(article => {
-			article['comment_count'] = comments.filter(
-				comment => comment.article_id === article.article_id
-			).length;
-		});
-
 		return articleQuery.rows;
 	}
 };

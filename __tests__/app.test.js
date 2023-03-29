@@ -120,9 +120,9 @@ describe('/api/articles', () => {
 					expect(articles).toBeInstanceOf(Array);
 					expect(articles).toHaveLength(12);
 					articles.forEach(article => {
-						let commentCount = commentData.filter(
-							comment => comment.article_id === article.article_id
-						).length;
+						let commentCount = commentData
+							.filter(comment => comment.article_id === article.article_id)
+							.length.toString();
 
 						expect(article).toMatchObject({
 							article_id: expect.any(Number),
