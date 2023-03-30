@@ -77,6 +77,71 @@ describe('/api/articles/:article_id', () => {
 		});
 	});
 
+	describe('201: PATCH: Votes', () => {
+		it('should respond with status 201 and an updated votes property, incremented by 1', () => {
+			const input = { inc_votes: 1 };
+
+			return request(app)
+				.patch('/api/articles/2')
+				.send(input)
+				.expect(201)
+				.then(({ body: { article } }) => {
+					expect(article).toMatchObject({
+						article_id: 2,
+						title: expect.any(String),
+						topic: expect.any(String),
+						author: expect.any(String),
+						body: expect.any(String),
+						created_at: expect.any(String),
+						votes: 1,
+						article_img_url: expect.any(String),
+					});
+				});
+		});
+
+		it('should respond with status 201 and an updated votes property, decremented by 1', () => {
+			const input = { inc_votes: -1 };
+
+			return request(app)
+				.patch('/api/articles/1')
+				.send(input)
+				.expect(201)
+				.then(({ body: { article } }) => {
+					expect(article).toMatchObject({
+						article_id: 1,
+						title: expect.any(String),
+						topic: expect.any(String),
+						author: expect.any(String),
+						body: expect.any(String),
+						created_at: expect.any(String),
+						votes: 99,
+						article_img_url: expect.any(String),
+					});
+				});
+		});
+
+		it('should respond with status 201 and ignore extra properties', () => {
+			const input = { inc_votes: 1, title: 'yahooo', votes: 999999 };
+
+			return request(app)
+				.patch('/api/articles/2')
+				.send(input)
+				.expect(201)
+				.then(({ body: { article } }) => {
+					expect(article).toMatchObject({
+						article_id: 2,
+						title: expect.any(String),
+						topic: expect.any(String),
+						author: expect.any(String),
+						body: expect.any(String),
+						created_at: expect.any(String),
+						votes: 1,
+						article_img_url: expect.any(String),
+					});
+				});
+		});
+	});
+
 	describe('400: GET:', () => {
 		it('responds with a 400 status code when given a value that is not a number', () => {
 			return request(app).get('/api/articles/not-a-num').expect(400);
@@ -100,6 +165,34 @@ describe('/api/articles/:article_id', () => {
 		it('responds with a message about the error', () => {
 			return request(app)
 				.get('/api/articles/999999')
+				.expect(404)
+				.then(({ body: { msg } }) => {
+					expect(msg).toBe('Resource not found');
+				});
+		});
+	});
+
+	describe('400: PATCH: Votes', () => {
+		it('should respond with status 400 when inc_votes is not present on request body', () => {
+			const input = { do_votes: 1 };
+
+			return request(app)
+				.patch('/api/articles/2')
+				.send(input)
+				.expect(400)
+				.then(({ body: { msg } }) => {
+					expect(msg).toBe('Bad request');
+				});
+		});
+	});
+
+	describe('404: PATCH: Votes', () => {
+		it('should respond with status 404 when article_id does not exist', () => {
+			const input = { inc_votes: 1 };
+
+			return request(app)
+				.patch('/api/articles/999999')
+				.send(input)
 				.expect(404)
 				.then(({ body: { msg } }) => {
 					expect(msg).toBe('Resource not found');
