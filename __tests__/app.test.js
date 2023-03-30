@@ -203,6 +203,30 @@ describe('/api/articles/:article_id/comments', () => {
 					});
 				});
 		});
+
+		it('responds with a status of 201 and ignores any additional properties on the request body', () => {
+			const comment = {
+				username: 'butter_bridge',
+				body: 'i am so hungry',
+				votes: 99999,
+				something: 'else to ignore',
+			};
+
+			return request(app)
+				.post('/api/articles/6/comments')
+				.send(comment)
+				.expect(201)
+				.then(({ body: { comment } }) => {
+					expect(comment).toMatchObject({
+						comment_id: expect.any(Number),
+						body: 'i am so hungry',
+						article_id: 6,
+						author: 'butter_bridge',
+						votes: 0,
+						created_at: expect.any(String),
+					});
+				});
+		});
 	});
 
 	describe('404: GET:', () => {
