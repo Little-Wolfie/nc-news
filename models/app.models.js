@@ -1,5 +1,15 @@
 const db = require('../db/connection');
 
+exports.fetchUser = async username => {
+	const userQuery = db.query(
+		`
+    SELECT * FROM users WHERE username = $1;
+  `,
+		[username]
+	);
+	return userQuery;
+};
+
 exports.fetchTopics = async () => {
 	const results = await db.query('SELECT * FROM topics');
 
@@ -44,9 +54,9 @@ exports.fetchArticles = async () => {
 };
 
 exports.fetchCommentsByArticleId = async id => {
-	const articleQuery = this.fetchArticleById(id);
+	const articleQuery = await this.fetchArticleById(id);
 
-	const commentsQuery = db.query(
+	const commentsQuery = await db.query(
 		`
     SELECT * FROM comments
     WHERE article_id = $1
@@ -65,9 +75,9 @@ exports.fetchCommentsByArticleId = async id => {
 };
 
 exports.createNewComment = async (id, username, body) => {
-	const articleQuery = this.fetchArticleById(id);
+	const articleQuery = await this.fetchArticleById(id);
 
-	const insertQuery = db.query(
+	const insertQuery = await db.query(
 		`
 	  INSERT INTO comments (votes, created_at, author, body, article_id)
 	  VALUES
@@ -86,12 +96,24 @@ exports.createNewComment = async (id, username, body) => {
 	}
 };
 
-exports.fetchUser = async username => {
-	const userQuery = db.query(
+exports.updateArticleVotes = async (id, amt) => {
+	const articleQuery = await this.fetchArticleById(id);
+
+	const updateQuery = await db.query(
 		`
-    SELECT * FROM users WHERE username = $1;
+    UPDATE articles
+    SET votes = articles.votes + $1
+    WHERE article_id = $2
+    RETURNING *;
   `,
-		[username]
+		[amt, id]
 	);
-	return userQuery;
+
+	const results = await Promise.all([articleQuery, updateQuery]);
+
+	if (results[0].rowCount === 0) {
+		return Promise.reject({ code: 404 });
+	} else {
+		return results[1].rows[0];
+	}
 };

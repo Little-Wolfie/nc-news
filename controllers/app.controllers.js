@@ -42,7 +42,9 @@ exports.getCommentsByArticleId = async (req, res, next) => {
 
 exports.postComment = async (req, res, next) => {
 	const { article_id } = req.params;
-	const { username, body } = req.body;
+	const {
+		body: { username, body },
+	} = req;
 
 	try {
 		if (!username || !body) {
@@ -59,6 +61,24 @@ exports.postComment = async (req, res, next) => {
 				);
 				res.status(201).send({ comment });
 			}
+		}
+	} catch (err) {
+		next(err);
+	}
+};
+
+exports.incrementArticleVotes = async (req, res, next) => {
+	const { article_id } = req.params;
+	const {
+		body: { inc_votes },
+	} = req;
+
+	try {
+		if (!inc_votes) {
+			next({ code: 400 });
+		} else {
+			const article = await models.updateArticleVotes(article_id, inc_votes);
+			res.status(201).send({ article });
 		}
 	} catch (err) {
 		next(err);
