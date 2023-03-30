@@ -85,6 +85,17 @@ exports.incrementArticleVotes = async (req, res, next) => {
 	}
 };
 
+exports.getComment = async (req, res, next) => {
+	const { comment_id } = req.params;
+
+	try {
+		const comment = await models.fetchComment(comment_id);
+		res.status(200).send({ comment });
+	} catch (err) {
+		next(err);
+	}
+};
+
 exports.removeComment = async (req, res, next) => {
 	const { comment_id } = req.params;
 

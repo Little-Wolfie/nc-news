@@ -130,24 +130,21 @@ exports.fetchComment = async id => {
 	if (results.rowCount === 0) {
 		return Promise.reject({ code: 404 });
 	} else {
-		return results;
+		return results.rows[0];
 	}
 };
 
 exports.deleteComment = async id => {
-	const comment = this.fetchComment(id);
-
-	const deleteQuery = db.query(
+	const deleteQuery = await db.query(
 		`
     DELETE FROM comments
-    WHERE comment_id = $1;
+    WHERE comment_id = $1
+    RETURNING *;
   `,
 		[id]
 	);
 
-	const results = await Promise.all([comment, deleteQuery]);
-
-	if (results.rowCount === 0) {
+	if (deleteQuery.rowCount === 0) {
 		return Promise.reject({ code: 404 });
 	}
 };

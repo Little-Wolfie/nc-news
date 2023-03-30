@@ -409,8 +409,16 @@ describe('/api/articles/:article_id/comments', () => {
 
 describe('/api/comments/:comment_id', () => {
 	describe('204: DELETE:', () => {
-		it('responds with status 204 and a message', () => {
-			return request(app).delete('/api/comments/1').expect(204);
+		it('responds with status 204', () => {
+			return request(app)
+				.get('/api/comments/1')
+				.expect(200)
+				.then(() => {
+					return request(app).delete('/api/comments/1').expect(204);
+				})
+				.then(() => {
+					return request(app).get('/api/comments/1').expect(404);
+				});
 		});
 	});
 
