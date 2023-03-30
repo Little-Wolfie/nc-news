@@ -39,3 +39,28 @@ exports.getCommentsByArticleId = async (req, res, next) => {
 		next(err);
 	}
 };
+
+exports.postComment = async (req, res, next) => {
+	const { article_id } = req.params;
+	const { username, body } = req.body;
+
+	try {
+		if (!username || !body) {
+			next({ code: 400 });
+		} else {
+			const user = await models.fetchUser(username);
+			if (user.rowCount === 0) {
+				next({ code: 404 });
+			} else {
+				const comment = await models.createNewComment(
+					article_id,
+					username,
+					body
+				);
+				res.status(201).send({ comment });
+			}
+		}
+	} catch (err) {
+		next(err);
+	}
+};
