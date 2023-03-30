@@ -239,6 +239,18 @@ describe('/api/articles/:article_id/comments', () => {
 					expect(msg).toBe('Resource not found');
 				});
 		});
+
+		it('responds with status 404 when the username given is not one in the database', () => {
+			const comment = { username: 'billy', body: 'i am so hungry' };
+
+			return request(app)
+				.post('/api/articles/6/comments')
+				.send(comment)
+				.expect(404)
+				.then(({ body: { msg } }) => {
+					expect(msg).toBe('Resource not found');
+				});
+		});
 	});
 
 	describe('400: POST:', () => {
@@ -252,6 +264,28 @@ describe('/api/articles/:article_id/comments', () => {
 				.then(({ body: { msg } }) => {
 					expect(msg).toBe('Bad request');
 				});
+		});
+
+		it('responds with status 400 when the request body is missing a username or a body', () => {
+			const comment1 = { username: 'butter_bridge' };
+			const comment2 = { body: 'i am so hungry' };
+
+			return Promise.all([
+				request(app)
+					.post('/api/articles/6/comments')
+					.send(comment1)
+					.expect(400)
+					.then(({ body: { msg } }) => {
+						expect(msg).toBe('Bad request');
+					}),
+				request(app)
+					.post('/api/articles/6/comments')
+					.send(comment2)
+					.expect(400)
+					.then(({ body: { msg } }) => {
+						expect(msg).toBe('Bad request');
+					}),
+			]);
 		});
 	});
 });

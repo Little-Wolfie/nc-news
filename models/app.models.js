@@ -44,13 +44,7 @@ exports.fetchArticles = async () => {
 };
 
 exports.fetchCommentsByArticleId = async id => {
-	const articleQuery = db.query(
-		`
-    SELECT * FROM articles
-    WHERE article_id = $1
-    `,
-		[id]
-	);
+	const articleQuery = this.fetchArticleById(id);
 
 	const commentsQuery = db.query(
 		`
@@ -71,13 +65,7 @@ exports.fetchCommentsByArticleId = async id => {
 };
 
 exports.createNewComment = async (id, username, body) => {
-	const articleQuery = db.query(
-		`
-    SELECT * FROM articles
-    WHERE article_id = $1
-    `,
-		[id]
-	);
+	const articleQuery = this.fetchArticleById(id);
 
 	const insertQuery = db.query(
 		`
@@ -96,4 +84,14 @@ exports.createNewComment = async (id, username, body) => {
 	} else {
 		return results[1].rows[0];
 	}
+};
+
+exports.fetchUser = async username => {
+	const userQuery = db.query(
+		`
+    SELECT * FROM users WHERE username = $1;
+  `,
+		[username]
+	);
+	return userQuery;
 };
