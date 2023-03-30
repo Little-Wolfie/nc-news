@@ -135,9 +135,9 @@ exports.fetchComment = async id => {
 };
 
 exports.deleteComment = async id => {
-	const comment = await this.fetchComment(id);
+	const comment = this.fetchComment(id);
 
-	const deleteQuery = await db.query(
+	const deleteQuery = db.query(
 		`
     DELETE FROM comments
     WHERE comment_id = $1;
@@ -145,7 +145,7 @@ exports.deleteComment = async id => {
 		[id]
 	);
 
-	const results = Promise.all([comment, deleteQuery]);
+	const results = await Promise.all([comment, deleteQuery]);
 
 	if (results.rowCount === 0) {
 		return Promise.reject({ code: 404 });
