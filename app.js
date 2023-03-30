@@ -14,6 +14,7 @@ app.get(
 );
 app.post('/api/articles/:article_id/comments', controllers.postComment);
 app.patch('/api/articles/:article_id', controllers.incrementArticleVotes);
+app.delete('/api/comments/:comment_id', controllers.removeComment);
 
 app.all('/*', errorHandlers.handleWrongPath);
 
