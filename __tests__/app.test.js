@@ -184,6 +184,27 @@ describe('/api/articles/:article_id/comments', () => {
 		});
 	});
 
+	describe('201: POST:', () => {
+		it('responds with a status of 201 and an object with the posted comment with a key of comment', () => {
+			const comment = { username: 'butter_bridge', body: 'i am so hungry' };
+
+			return request(app)
+				.post('/api/articles/6/comments')
+				.send(comment)
+				.expect(201)
+				.then(({ body: { comment } }) => {
+					expect(comment).toMatchObject({
+						comment_id: expect.any(Number),
+						body: 'i am so hungry',
+						article_id: 6,
+						author: 'butter_bridge',
+						votes: 0,
+						created_at: expect.any(String),
+					});
+				});
+		});
+	});
+
 	describe('404: GET:', () => {
 		it('responds with status 404 when given an article_id that does not exist yet', () => {
 			return request(app)
@@ -199,6 +220,34 @@ describe('/api/articles/:article_id/comments', () => {
 		it('responds with status 400 when given an article_id that can not exist', () => {
 			return request(app)
 				.get('/api/articles/someid/comments')
+				.expect(400)
+				.then(({ body: { msg } }) => {
+					expect(msg).toBe('Bad request');
+				});
+		});
+	});
+
+	describe('404: POST:', () => {
+		it('responds with status 404 when given an article_id that does not exist yet', () => {
+			const comment = { username: 'butter_bridge', body: 'i am so hungry' };
+
+			return request(app)
+				.post('/api/articles/99999/comments')
+				.send(comment)
+				.expect(404)
+				.then(({ body: { msg } }) => {
+					expect(msg).toBe('Resource not found');
+				});
+		});
+	});
+
+	describe('400: POST:', () => {
+		it('responds with status 400 when given an article_id that can not exist', () => {
+			const comment = { username: 'butter_bridge', body: 'i am so hungry' };
+
+			return request(app)
+				.post('/api/articles/someid/comments')
+				.send(comment)
 				.expect(400)
 				.then(({ body: { msg } }) => {
 					expect(msg).toBe('Bad request');

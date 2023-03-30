@@ -69,3 +69,31 @@ exports.fetchCommentsByArticleId = async id => {
 		return results[1].rows;
 	}
 };
+
+exports.createNewComment = async (id, username, body) => {
+	const articleQuery = db.query(
+		`
+    SELECT * FROM articles
+    WHERE article_id = $1
+    `,
+		[id]
+	);
+
+	const insertQuery = db.query(
+		`
+	  INSERT INTO comments (votes, created_at, author, body, article_id)
+	  VALUES
+    ($1, $2, $3, $4, $5)
+	  RETURNING *
+	`,
+		[0, new Date(), username, body, id]
+	);
+
+	const results = await Promise.all([articleQuery, insertQuery]);
+
+	if (results[0].rowCount === 0) {
+		return Promise.reject({ code: 404 });
+	} else {
+		return results[1].rows[0];
+	}
+};

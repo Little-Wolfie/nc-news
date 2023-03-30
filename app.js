@@ -3,6 +3,7 @@ const controllers = require('./controllers/app.controllers');
 const errorHandlers = require('./error-handlers.js');
 
 const app = express();
+app.use(express.json());
 
 app.get('/api/topics', controllers.getTopics);
 app.get('/api/articles', controllers.getArticles);
@@ -11,6 +12,7 @@ app.get(
 	'/api/articles/:article_id/comments',
 	controllers.getCommentsByArticleId
 );
+app.post('/api/articles/:article_id/comments', controllers.postComment);
 
 app.all('/*', errorHandlers.handleWrongPath);
 

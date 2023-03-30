@@ -39,3 +39,15 @@ exports.getCommentsByArticleId = async (req, res, next) => {
 		next(err);
 	}
 };
+
+exports.postComment = async (req, res, next) => {
+	const { article_id } = req.params;
+	const { username, body } = req.body;
+
+	try {
+		const comment = await models.createNewComment(article_id, username, body);
+		res.status(201).send({ comment });
+	} catch (err) {
+		next(err);
+	}
+};
