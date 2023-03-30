@@ -117,3 +117,34 @@ exports.updateArticleVotes = async (id, amt) => {
 		return results[1].rows[0];
 	}
 };
+
+exports.fetchComment = async id => {
+	const results = await db.query(
+		`
+    SELECT * FROM comments
+    WHERE comment_id = $1;
+  `,
+		[id]
+	);
+
+	if (results.rowCount === 0) {
+		return Promise.reject({ code: 404 });
+	} else {
+		return results.rows[0];
+	}
+};
+
+exports.deleteComment = async id => {
+	const deleteQuery = await db.query(
+		`
+    DELETE FROM comments
+    WHERE comment_id = $1
+    RETURNING *;
+  `,
+		[id]
+	);
+
+	if (deleteQuery.rowCount === 0) {
+		return Promise.reject({ code: 404 });
+	}
+};

@@ -19,5 +19,6 @@ exports.handleWrongPath = (req, res, next) => {
 };
 
 exports.handleUncaughtError = (err, req, res, next) => {
+  console.error(err);
 	res.status(500).send({ msg: 'Something went wrong there, try again' });
 };

@@ -406,3 +406,41 @@ describe('/api/articles/:article_id/comments', () => {
 		});
 	});
 });
+
+describe('/api/comments/:comment_id', () => {
+	describe('204: DELETE:', () => {
+		it('responds with status 204', () => {
+			return request(app)
+				.get('/api/comments/1')
+				.expect(200)
+				.then(() => {
+					return request(app).delete('/api/comments/1').expect(204);
+				})
+				.then(() => {
+					return request(app).get('/api/comments/1').expect(404);
+				});
+		});
+	});
+
+	describe('404: DELETE:', () => {
+		it('responds with status 404 when the comment id does not exist', () => {
+			return request(app)
+				.delete('/api/comments/99999')
+				.expect(404)
+				.then(({ body: { msg } }) => {
+					expect(msg).toBe('Resource not found');
+				});
+		});
+	});
+
+	describe('400: DELETE:', () => {
+		it('responds with status 400 when given a non int value', () => {
+			return request(app)
+				.delete('/api/comments/not-a-num')
+				.expect(400)
+				.then(({ body: { msg } }) => {
+					expect(msg).toBe('Bad request');
+				});
+		});
+	});
+});
