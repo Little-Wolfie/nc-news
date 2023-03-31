@@ -21,8 +21,10 @@ exports.getArticleById = async (req, res, next) => {
 };
 
 exports.getArticles = async (req, res, next) => {
+	const { topic, sort_by, order_by } = req.query;
+
 	try {
-		const articles = await models.fetchArticles();
+		const articles = await models.fetchArticles(topic, sort_by, order_by);
 		res.status(200).send({ articles });
 	} catch (err) {
 		next(err);

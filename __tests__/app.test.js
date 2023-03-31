@@ -245,6 +245,94 @@ describe('/api/articles', () => {
 	});
 });
 
+describe('/api/articles - Queries', () => {
+	describe('Topic', () => {
+		describe('200: ?topic', () => {
+			it('responds with status 200 and with a list of articles by topic', () => {
+				return request(app)
+					.get('/api/articles?topic=mitch')
+					.expect(200)
+					.then(({ body: { articles } }) => {
+						expect(articles).toHaveLength(11);
+						const correctTopic = articles.every(
+							article => article.topic === 'mitch'
+						);
+						expect(correctTopic).toBe(true);
+					});
+			});
+
+			it('responds with status 200 and an empty array when a topic has no articles', () => {
+				return request(app)
+					.get('/api/articles?topic=paper')
+					.expect(200)
+					.then(({ body: { articles } }) => {
+						expect(articles).toEqual([]);
+					});
+			});
+		});
+
+		describe('404: ?topic', () => {
+			it('responds with status 404 if given a non whitelisted topic', () => {
+				return request(app)
+					.get('/api/articles?topic=dogs')
+					.expect(404)
+					.then(({ body: { msg } }) => {
+						expect(msg).toBe('Resource not found');
+					});
+			});
+		});
+	});
+
+	describe('Sort BY', () => {
+		describe('200: ?sort_by: title', () => {
+			it('responds with status 200 and with a list of articles sorted by title', () => {
+				return request(app)
+					.get('/api/articles?sort_by=title')
+					.expect(200)
+					.then(({ body: { articles } }) => {
+						expect(articles).toHaveLength(12);
+						expect(articles).toBeSortedBy('title', { descending: true });
+					});
+			});
+		});
+
+		describe('400: ?sort_by', () => {
+			it('responds with status 400 if given a non whitelisted sorter', () => {
+				return request(app)
+					.get('/api/articles?sort_by=bananas')
+					.expect(400)
+					.then(({ body: { msg } }) => {
+						expect(msg).toBe('Bad request');
+					});
+			});
+		});
+	});
+
+	describe('Order BY', () => {
+		describe('200: ?order_by asc', () => {
+			it('responds with status 200 and with a list of articles sorted by title in asc order', () => {
+				return request(app)
+					.get('/api/articles?sort_by=title&order_by=asc')
+					.expect(200)
+					.then(({ body: { articles } }) => {
+						expect(articles).toBeSortedBy('title', { descending: false });
+					});
+			});
+		});
+
+		describe('400: ?order_by', () => {
+			it('responds with status 400 if given a non whitelisted order', () => {
+				return request(app)
+					.get('/api/articles?sort_by=upwards')
+					.expect(400)
+					.then(({ body: { msg } }) => {
+						expect(msg).toBe('Bad request');
+					});
+			});
+		});
+	});
+});
+
 describe('/api/articles/:article_id/comments', () => {
 	describe('200: GET:', () => {
 		it('responds with status 200 and an array of comments with the right shape', () => {
