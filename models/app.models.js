@@ -1,7 +1,7 @@
 const db = require('../db/connection');
 
 exports.fetchUser = async username => {
-	const userQuery = db.query(
+	const userQuery = await db.query(
 		`
     SELECT * FROM users WHERE username = $1;
   `,
@@ -33,18 +33,47 @@ exports.fetchArticleById = async id => {
 	}
 };
 
-exports.fetchArticles = async () => {
-	const articleQuery = await db.query(
-		`SELECT articles.*, COALESCE(comments.comment_count, 0) AS comment_count
+exports.fetchArticles = async (topic, sort_by, order_by) => {
+	const queryParams = [];
+
+	let queryString = `
+    SELECT articles.*, COALESCE(comments.comment_count, 0) AS comment_count
     FROM articles
     LEFT JOIN (
     SELECT article_id, COUNT(article_id) AS comment_count
     FROM comments
     GROUP BY article_id
     ) comments
-    ON articles.article_id = comments.article_id
-    ORDER BY articles.created_at DESC;`
-	);
+    ON articles.article_id = comments.article_id `;
+
+	if (topic) {
+		queryString += `
+      WHERE topic = $1
+      `;
+		queryParams.push(topic);
+	}
+
+	if (sort_by) {
+		queryString += `
+    ORDER BY articles.${sort_by}
+    `;
+	} else {
+		queryString += `
+    ORDER BY articles.created_at
+    `;
+	}
+
+	if (order_by) {
+		queryString += `
+    ${order_by};
+  `;
+	} else {
+		queryString += `
+    DESC;
+  `;
+	}
+
+	const articleQuery = await db.query(queryString, queryParams);
 
 	if (articleQuery.rowCount === 0) {
 		return Promise.reject({ code: 404 });

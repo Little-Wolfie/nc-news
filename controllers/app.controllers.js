@@ -21,8 +21,25 @@ exports.getArticleById = async (req, res, next) => {
 };
 
 exports.getArticles = async (req, res, next) => {
+	const { topic, sort_by, order_by } = req.query;
+
+	if (topic && !['mitch', 'cats'].includes(topic)) {
+		return next({ code: 400 });
+	}
+	if (
+		sort_by &&
+		!['title', 'votes', 'comment_count', 'author', 'created_at'].includes(
+			sort_by
+		)
+	) {
+		return next({ code: 400 });
+	}
+	if (order_by && !['asc', 'desc'].includes(order_by)) {
+		return next({ code: 400 });
+	}
+
 	try {
-		const articles = await models.fetchArticles();
+		const articles = await models.fetchArticles(topic, sort_by, order_by);
 		res.status(200).send({ articles });
 	} catch (err) {
 		next(err);
