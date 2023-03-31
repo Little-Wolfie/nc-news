@@ -444,3 +444,34 @@ describe('/api/comments/:comment_id', () => {
 		});
 	});
 });
+
+describe('/api/users', () => {
+	describe('200: GET:', () => {
+		it('responds with a status 200 and a list of user objects', () => {
+			return request(app)
+				.get('/api/users')
+				.expect(200)
+				.then(({ body: { users } }) => {
+					expect(users).toHaveLength(4);
+					users.forEach(user => {
+						expect(user).toMatchObject({
+							username: expect.any(String),
+							name: expect.any(String),
+							avatar_url: expect.any(String),
+						});
+					});
+				});
+		});
+	});
+
+	describe('404: GET: no users', () => {
+		it('responds with a status 404 when path is wrong', async () => {
+			return request(app)
+				.get('/api/user')
+				.expect(404)
+				.then(({ body: { msg } }) => {
+					expect(msg).toBe('Resource not found');
+				});
+		});
+	});
+});
