@@ -75,6 +75,16 @@ describe('/api/articles/:article_id', () => {
 					});
 				});
 		});
+
+    it('should have a key named comment_count', () => {
+			return request(app)
+				.get('/api/articles/1')
+				.expect(200)
+				.then(({ body: { article } }) => {
+					expect(article).toHaveProperty('comment_count');
+					expect(article.comment_count).toBe('11');
+				});
+		});
 	});
 
 	describe('201: PATCH: Votes', () => {
