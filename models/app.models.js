@@ -36,6 +36,25 @@ exports.fetchArticleById = async id => {
 exports.fetchArticles = async (topic, sort_by, order_by) => {
 	const queryParams = [];
 
+	const results = await this.fetchTopics();
+	const topics = results.map(topic => topic.slug);
+
+	if (topic && !topics.includes(topic)) {
+		return Promise.reject({ code: 404 });
+	}
+
+	if (
+		sort_by &&
+		!['title', 'votes', 'comment_count', 'author', 'created_at'].includes(
+			sort_by
+		)
+	) {
+		return Promise.reject({ code: 400 });
+	}
+	if (order_by && !['asc', 'desc'].includes(order_by)) {
+		return Promise.reject({ code: 400 });
+	}
+
 	let queryString = `
     SELECT articles.*, COALESCE(comments.comment_count, 0) AS comment_count
     FROM articles
@@ -76,7 +95,7 @@ exports.fetchArticles = async (topic, sort_by, order_by) => {
 	const articleQuery = await db.query(queryString, queryParams);
 
 	if (articleQuery.rowCount === 0) {
-		return Promise.reject({ code: 404 });
+		return [];
 	} else {
 		return articleQuery.rows;
 	}

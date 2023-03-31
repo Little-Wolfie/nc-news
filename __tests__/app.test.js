@@ -260,15 +260,24 @@ describe('/api/articles - Queries', () => {
 						expect(correctTopic).toBe(true);
 					});
 			});
+
+			it('responds with status 200 and an empty array when a topic has no articles', () => {
+				return request(app)
+					.get('/api/articles?topic=paper')
+					.expect(200)
+					.then(({ body: { articles } }) => {
+						expect(articles).toEqual([]);
+					});
+			});
 		});
 
-		describe('400: ?topic', () => {
-			it('responds with status 400 if given a non whitelisted topic', () => {
+		describe('404: ?topic', () => {
+			it('responds with status 404 if given a non whitelisted topic', () => {
 				return request(app)
 					.get('/api/articles?topic=dogs')
-					.expect(400)
+					.expect(404)
 					.then(({ body: { msg } }) => {
-						expect(msg).toBe('Bad request');
+						expect(msg).toBe('Resource not found');
 					});
 			});
 		});
