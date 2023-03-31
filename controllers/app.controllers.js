@@ -106,3 +106,12 @@ exports.removeComment = async (req, res, next) => {
 		next(err);
 	}
 };
+
+exports.getUsers = async (req, res, next) => {
+	try {
+		const users = await models.fetchUsers();
+		res.status(200).send({ users });
+	} catch (err) {
+		next(err);
+	}
+};

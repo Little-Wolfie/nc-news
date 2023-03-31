@@ -148,3 +148,11 @@ exports.deleteComment = async id => {
 		return Promise.reject({ code: 404 });
 	}
 };
+
+exports.fetchUsers = async () => {
+	const results = await db.query(`
+    SELECT * FROM users;
+  `);
+
+	return results.rows;
+};
