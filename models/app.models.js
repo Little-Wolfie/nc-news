@@ -67,7 +67,7 @@ exports.fetchArticles = async (topic, sort_by, order_by) => {
 	}
 
 	let queryString = `
-    SELECT articles.*, COALESCE(comments.comment_count, 0) AS comment_count
+    SELECT articles.*, COALESCE(comments.comment_count::integer, 0) AS comment_count
     FROM articles
     LEFT JOIN (
     SELECT article_id, COUNT(article_id) AS comment_count
@@ -84,9 +84,15 @@ exports.fetchArticles = async (topic, sort_by, order_by) => {
 	}
 
 	if (sort_by) {
-		queryString += `
-    ORDER BY articles.${sort_by}
+		if (sort_by === 'comment_count') {
+			queryString += `
+      ORDER BY comment_count
     `;
+		} else {
+			queryString += `
+      ORDER BY articles.${sort_by}
+    `;
+		}
 	} else {
 		queryString += `
     ORDER BY articles.created_at
@@ -102,7 +108,6 @@ exports.fetchArticles = async (topic, sort_by, order_by) => {
     DESC;
   `;
 	}
-
 	const articleQuery = await db.query(queryString, queryParams);
 
 	if (articleQuery.rowCount === 0) {

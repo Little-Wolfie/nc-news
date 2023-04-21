@@ -306,6 +306,20 @@ describe('/api/articles - Queries', () => {
 			});
 		});
 
+    describe.only('200: ?sort_by: comment_count', () => {
+			it('responds with status 200 and with a list of articles sorted by comment count', () => {
+				return request(app)
+					.get('/api/articles?sort_by=comment_count')
+					.expect(200)
+					.then(({ body: { articles } }) => {
+						expect(articles).toHaveLength(12);
+						expect(articles).toBeSortedBy('comment_count', {
+							descending: true,
+						});
+					});
+			});
+		});
+
 		describe('400: ?sort_by', () => {
 			it('responds with status 400 if given a non whitelisted sorter', () => {
 				return request(app)
